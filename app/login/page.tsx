@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
   ArrowLeft,
   Mail,
@@ -11,58 +12,17 @@ import {
   ArrowRight,
   ShieldCheck,
   Check,
-  TrendingUp,
   CheckCircle2,
   HelpCircle,
-  Laptop,
-  Users,
   Shield,
   X,
   AlertCircle,
-  ExternalLink,
+  Crown,
+  User,
 } from 'lucide-react';
 import Logo from '@/components/Logo';
 
-type DemoRole = 'admin' | 'manager' | 'engineer';
-
-interface RolePreset {
-  role: DemoRole;
-  title: string;
-  email: string;
-  displayEmail: string;
-  name: string;
-  icon: typeof Shield;
-}
-
-const DEMO_ROLES: RolePreset[] = [
-  {
-    role: 'admin',
-    title: 'Admin',
-    email: 'admin@company.com',
-    displayEmail: 'admin@company.com',
-    name: 'Administrator',
-    icon: Shield,
-  },
-  {
-    role: 'manager',
-    title: 'Manager',
-    email: 'priya.singh@company.com',
-    displayEmail: 'priya.singh@...',
-    name: 'Priya Singh',
-    icon: Users,
-  },
-  {
-    role: 'engineer',
-    title: 'Engineer',
-    email: 'rahul.sharma@company.com',
-    displayEmail: 'rahul.sharma@...',
-    name: 'Rahul Sharma',
-    icon: Laptop,
-  },
-];
-
 export default function LoginPage() {
-  const [selectedRole, setSelectedRole] = useState<DemoRole>('admin');
   const [email, setEmail] = useState('admin@company.com');
   const [password, setPassword] = useState('••••••••••••••');
   const [showPassword, setShowPassword] = useState(false);
@@ -75,13 +35,7 @@ export default function LoginPage() {
   const [showSupportModal, setShowSupportModal] = useState(false);
   const [showSecurityModal, setShowSecurityModal] = useState(false);
 
-  const handleSelectRole = (preset: RolePreset) => {
-    setSelectedRole(preset.role);
-    setEmail(preset.email);
-    setPassword('SecurePass2026!');
-    setErrors({});
-    setAuthSuccessNotice(null);
-  };
+  const router = useRouter();
 
   const handleSignIn = (e: FormEvent) => {
     e.preventDefault();
@@ -107,13 +61,40 @@ export default function LoginPage() {
     }
 
     setIsLoading(true);
+    setAuthSuccessNotice(`Authenticating credentials... Redirecting to workspace.`);
 
     setTimeout(() => {
       setIsLoading(false);
-      setAuthSuccessNotice(
-        `Workspace Demo Verified: Logged in as ${email} (${selectedRole.toUpperCase()}). Database & backend auth will connect to this screen upon backend deployment.`
-      );
-    }, 600);
+      const lower = email.toLowerCase();
+      if (lower.includes('manager')) {
+        router.push('/manager/dashboard');
+      } else if (lower.includes('user') || lower.includes('dev') || lower.includes('member')) {
+        router.push('/assignments');
+      } else {
+        // Admin login goes directly to Admin Dashboard!
+        router.push('/admin/dashboard');
+      }
+    }, 300);
+  };
+
+  const loginAsRole = (role: 'admin' | 'manager' | 'member') => {
+    setIsLoading(true);
+    if (role === 'admin') {
+      setEmail('admin@company.com');
+      setPassword('••••••••••••••');
+      setAuthSuccessNotice('Admin authenticated successfully! Loading Admin Dashboard...');
+      setTimeout(() => router.push('/admin/dashboard'), 350);
+    } else if (role === 'manager') {
+      setEmail('manager.priya@company.com');
+      setPassword('••••••••••••••');
+      setAuthSuccessNotice('Manager authenticated! Loading Manager Review Portal...');
+      setTimeout(() => router.push('/manager/dashboard'), 350);
+    } else {
+      setEmail('developer.ankit@company.com');
+      setPassword('••••••••••••••');
+      setAuthSuccessNotice('Team Member authenticated! Loading Daily Workspaces...');
+      setTimeout(() => router.push('/assignments'), 350);
+    }
   };
 
   const handleSSO = (provider: string) => {
@@ -132,13 +113,21 @@ export default function LoginPage() {
           <Logo showText={true} iconSize="md" />
         </div>
 
-        {/* Right: Enterprise Portal & Support */}
-        <div className="flex items-center gap-4 text-xs font-semibold text-gray-600">
-          <span className="hidden sm:inline-block tracking-wider uppercase text-gray-500 font-bold text-[11px]">
-            ENTERPRISE PORTAL
-          </span>
+        {/* Right: Enterprise Portal & Direct Admin link */}
+        <div className="flex items-center gap-3 text-xs font-semibold text-gray-600">
+          <Link
+            href="/admin/dashboard"
+            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-lime-50 hover:bg-lime-100 text-[#4d7c0f] border border-lime-300 font-bold text-xs transition-colors"
+            title="Open Admin Dashboard directly"
+          >
+            <Crown className="w-3.5 h-3.5 text-[#65a30d]" />
+            <span>Admin View</span>
+          </Link>
           <span className="hidden sm:inline-block text-gray-300" aria-hidden="true">
             |
+          </span>
+          <span className="hidden sm:inline-block tracking-wider uppercase text-gray-500 font-bold text-[11px]">
+            ENTERPRISE PORTAL
           </span>
           <button
             onClick={() => setShowSupportModal(true)}
@@ -197,49 +186,6 @@ export default function LoginPage() {
                 </p>
               </div>
 
-              {/* Quick Demo Auto-Fill Box */}
-              <div className="mb-6 bg-slate-50 border border-slate-200/90 rounded-2xl p-3.5">
-                <div className="flex items-center justify-between mb-2.5 text-[11px]">
-                  <span className="font-bold text-gray-700 tracking-wider uppercase">
-                    QUICK DEMO AUTO-FILL
-                  </span>
-                  <span className="font-mono text-gray-400 text-[10px]">
-                    Click role to test
-                  </span>
-                </div>
-
-                <div className="grid grid-cols-3 gap-2">
-                  {DEMO_ROLES.map((preset) => {
-                    const RoleIcon = preset.icon;
-                    const isActive = selectedRole === preset.role;
-                    return (
-                      <button
-                        key={preset.role}
-                        type="button"
-                        onClick={() => handleSelectRole(preset)}
-                        className={`p-2 rounded-xl text-left border transition-all text-xs flex flex-col justify-between ${
-                          isActive
-                            ? 'bg-white border-[#65a30d] ring-2 ring-[#65a30d]/20 shadow-xs'
-                            : 'bg-white/80 border-gray-200 hover:border-gray-300 hover:bg-white'
-                        }`}
-                      >
-                        <div className="flex items-center justify-between w-full mb-1">
-                          <span className="font-bold text-gray-900">{preset.title}</span>
-                          <RoleIcon
-                            className={`w-3.5 h-3.5 ${
-                              isActive ? 'text-[#65a30d]' : 'text-gray-400'
-                            }`}
-                          />
-                        </div>
-                        <span className="text-[10px] text-gray-500 font-mono truncate w-full">
-                          {preset.displayEmail}
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
               {/* Status / Notices */}
               {authSuccessNotice && (
                 <div className="mb-5 p-3.5 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-800 flex items-start gap-2.5">
@@ -272,6 +218,70 @@ export default function LoginPage() {
                   </button>
                 </div>
               )}
+
+              {/* One-Click Instant Role Sign-In */}
+              <div className="mb-5 bg-slate-50 border border-gray-200/90 rounded-2xl p-3.5 shadow-2xs">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-gray-500">
+                    One-Click Instant Logins
+                  </span>
+                  <span className="text-[10px] font-bold text-[#65a30d]">
+                    Quick Test Access
+                  </span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => loginAsRole('admin')}
+                    className="p-2.5 rounded-xl border-2 border-[#65a30d] bg-lime-50/90 hover:bg-lime-100/90 text-left transition-all group flex flex-col justify-between shadow-2xs cursor-pointer"
+                  >
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-xs font-bold text-gray-900 group-hover:text-[#4d7c0f] flex items-center gap-1.5">
+                        <Crown className="w-3.5 h-3.5 text-[#65a30d]" />
+                        <span>Admin</span>
+                      </span>
+                      <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-[#65a30d] text-white">
+                        Full
+                      </span>
+                    </div>
+                    <p className="text-[10px] text-gray-500 font-medium">Opens Admin Dashboard</p>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => loginAsRole('manager')}
+                    className="p-2.5 rounded-xl border border-gray-200 bg-white hover:border-blue-300 hover:bg-blue-50/60 text-left transition-all group flex flex-col justify-between shadow-2xs cursor-pointer"
+                  >
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-xs font-bold text-gray-900 group-hover:text-blue-700 flex items-center gap-1.5">
+                        <Shield className="w-3.5 h-3.5 text-blue-500" />
+                        <span>Manager</span>
+                      </span>
+                      <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-blue-100 text-blue-700">
+                        Reviews
+                      </span>
+                    </div>
+                    <p className="text-[10px] text-gray-500 font-medium">Opens Squad Reviews</p>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => loginAsRole('member')}
+                    className="p-2.5 rounded-xl border border-gray-200 bg-white hover:border-gray-400 hover:bg-gray-100/70 text-left transition-all group flex flex-col justify-between shadow-2xs cursor-pointer"
+                  >
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-xs font-bold text-gray-900 flex items-center gap-1.5">
+                        <User className="w-3.5 h-3.5 text-gray-500" />
+                        <span>Member</span>
+                      </span>
+                      <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-gray-200 text-gray-700">
+                        Tasks
+                      </span>
+                    </div>
+                    <p className="text-[10px] text-gray-500 font-medium">Opens Daily Logs</p>
+                  </button>
+                </div>
+              </div>
 
               {/* Login Form */}
               <form onSubmit={handleSignIn} noValidate className="space-y-4">
@@ -379,8 +389,8 @@ export default function LoginPage() {
                     <span className="font-medium">Remember device for 30 days</span>
                   </label>
 
-                  <span className="text-[#65a30d] font-bold capitalize">
-                    Active: {selectedRole}
+                  <span className="text-[#65a30d] font-bold text-xs">
+                    Active: Admin
                   </span>
                 </div>
 
@@ -502,7 +512,7 @@ export default function LoginPage() {
               </div>
 
               {/* Three Value Bullets */}
-              <div className="space-y-2.5 text-xs sm:text-sm text-gray-200">
+              <div className="space-y-3 text-xs sm:text-sm text-gray-200 pt-2">
                 <div className="flex items-center gap-2.5">
                   <Check className="w-4 h-4 text-[#65a30d] stroke-[2.8] shrink-0" />
                   <span>Real-time daily standup logs &amp; deliverables</span>
@@ -514,79 +524,6 @@ export default function LoginPage() {
                 <div className="flex items-center gap-2.5">
                   <Check className="w-4 h-4 text-[#65a30d] stroke-[2.8] shrink-0" />
                   <span>Automated weekly timesheets &amp; workload trends</span>
-                </div>
-              </div>
-
-              {/* Miniature Product Preview Box */}
-              <div className="bg-gray-900/90 rounded-2xl p-2.5 border border-gray-700/80 shadow-lg overflow-hidden group">
-                <div className="bg-white rounded-xl p-3 text-gray-900">
-                  <div className="flex items-center justify-between pb-2 border-b border-gray-100 text-[10px]">
-                    <div className="flex items-center gap-1.5 font-bold">
-                      <span className="w-2 h-2 rounded-full bg-[#65a30d]" />
-                      <span>Ingage TaskFlow Live Overview</span>
-                    </div>
-                    <span className="text-gray-400 font-mono">12 Projects</span>
-                  </div>
-                  <div className="pt-2.5 grid grid-cols-3 gap-2 text-center text-[10px]">
-                    <div className="bg-gray-50 p-1.5 rounded-lg">
-                      <p className="text-gray-400 text-[9px]">Active</p>
-                      <p className="font-bold text-gray-900 text-xs">8</p>
-                    </div>
-                    <div className="bg-lime-50 p-1.5 rounded-lg text-[#4d7c0f]">
-                      <p className="text-[9px]">Completed</p>
-                      <p className="font-bold text-xs">3</p>
-                    </div>
-                    <div className="bg-blue-50 p-1.5 rounded-lg text-blue-800">
-                      <p className="text-[9px]">Team</p>
-                      <p className="font-bold text-xs">15</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Two Metric Cards */}
-              <div className="grid grid-cols-2 gap-3">
-                {/* Metric 1 */}
-                <div className="bg-gray-800/70 border border-gray-700/80 rounded-2xl p-3.5">
-                  <div className="flex items-center justify-between text-xs text-gray-400 mb-1">
-                    <span>Active Sprints</span>
-                    <TrendingUp className="w-3.5 h-3.5 text-[#65a30d]" />
-                  </div>
-                  <div className="text-xl font-extrabold text-white tabular-nums">
-                    84.2%
-                  </div>
-                  <p className="text-[10px] text-[#65a30d] font-semibold mt-0.5">
-                    On track delivery
-                  </p>
-                </div>
-
-                {/* Metric 2 */}
-                <div className="bg-gray-800/70 border border-gray-700/80 rounded-2xl p-3.5">
-                  <div className="flex items-center justify-between text-xs text-gray-400 mb-1">
-                    <span>Daily Logs</span>
-                    <CheckCircle2 className="w-3.5 h-3.5 text-[#65a30d]" />
-                  </div>
-                  <div className="text-xl font-extrabold text-white tabular-nums">
-                    24 / 28
-                  </div>
-                  <p className="text-[10px] text-gray-400 font-medium mt-0.5">
-                    Submitted today
-                  </p>
-                </div>
-              </div>
-
-              {/* Testimonial Quote */}
-              <div className="bg-gray-800/50 border border-gray-700/60 rounded-2xl p-3.5 sm:p-4">
-                <p className="text-xs text-gray-300 italic leading-relaxed">
-                  &ldquo;Ingage TaskFlow helped our 50+ developers streamline blockers and hit
-                  a 96% on-time sprint release target.&rdquo;
-                </p>
-                <div className="flex items-center gap-2 mt-3 pt-2.5 border-t border-gray-700/60">
-                  <div className="w-6 h-6 rounded-full bg-[#a3e635] text-gray-900 font-extrabold text-[10px] flex items-center justify-center">
-                    PS
-                  </div>
-                  <span className="text-xs font-semibold text-white">Priya Singh</span>
-                  <span className="text-xs text-gray-400">• Engineering Director</span>
                 </div>
               </div>
             </div>
