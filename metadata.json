@@ -1,0 +1,6 @@
+{
+  "name": "Ingage TaskFlow",
+  "description": "Project & Daily Work Tracking System designed for modern teams to track projects, manage daily tasks, and achieve goals.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
