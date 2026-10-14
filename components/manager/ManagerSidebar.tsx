@@ -12,6 +12,9 @@ import {
   Settings,
   X,
   Repeat,
+  ShieldCheck,
+  Crown,
+  UserCheck,
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -25,6 +28,7 @@ const MANAGER_NAV_ITEMS = [
   { name: 'My Projects', href: '/manager/projects', icon: FolderKanban },
   { name: 'Team Members', href: '/manager/team', icon: Users },
   { name: 'Daily Updates', href: '/manager/daily-updates', icon: CalendarCheck },
+  { name: 'Reviews', href: '/manager/reviews', icon: ShieldCheck },
   { name: 'Reports', href: '/manager/reports', icon: BarChart3 },
   { name: 'Profile', href: '/manager/profile', icon: User },
 ];
@@ -163,13 +167,22 @@ export default function ManagerSidebar({ isOpen, onClose }: ManagerSidebarProps)
             <div className="absolute bottom-20 right-3 left-3 bg-[#1e293b] border border-gray-700 rounded-xl p-2 shadow-2xl text-xs z-50 animate-fadeIn">
               <p className="text-[10px] font-bold text-gray-400 uppercase px-2 py-1">SWITCH WORKSPACE</p>
               <Link
-                href="/dashboard"
+                href="/admin/dashboard"
                 className="flex items-center gap-2 px-2.5 py-2 rounded-lg text-gray-200 hover:bg-gray-700 transition-colors font-medium"
               >
                 <div className="w-5 h-5 rounded bg-lime-500 text-gray-950 font-bold text-[10px] flex items-center justify-center">
                   AD
                 </div>
                 <span>Admin Workspace</span>
+              </Link>
+              <Link
+                href="/user/dashboard"
+                className="flex items-center gap-2 px-2.5 py-2 rounded-lg text-gray-200 hover:bg-gray-700 transition-colors font-medium"
+              >
+                <div className="w-5 h-5 rounded bg-emerald-500 text-gray-950 font-bold text-[10px] flex items-center justify-center">
+                  US
+                </div>
+                <span>User / Member Workspace</span>
               </Link>
               <Link
                 href="/login"

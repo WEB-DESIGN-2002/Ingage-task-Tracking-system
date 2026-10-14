@@ -25,6 +25,7 @@ interface SidebarProps {
 
 const NAV_ITEMS = [
   { name: 'Admin Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
+  { name: 'User Dashboard', href: '/user/dashboard', icon: UserCheck },
   { name: 'Projects', href: '/projects', icon: FolderKanban },
   { name: 'Assignments', href: '/assignments', icon: ClipboardList },
   { name: 'Users', href: '/users', icon: Users },
@@ -164,12 +165,20 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
           {showUserMenu && (
             <div className="absolute bottom-16 right-3 left-3 bg-[#1e293b] border border-gray-700 rounded-xl p-1.5 shadow-xl text-xs z-50 animate-fadeIn">
               <Link
-                href="/users"
+                href="/user/dashboard"
                 className="flex items-center gap-2 px-3 py-2 rounded-lg text-gray-200 hover:bg-gray-700 transition-colors"
                 onClick={() => setShowUserMenu(false)}
               >
                 <UserCheck className="w-3.5 h-3.5 text-lime-400" />
-                <span>Switch Role / Profile</span>
+                <span>Switch to User View</span>
+              </Link>
+              <Link
+                href="/manager/dashboard"
+                className="flex items-center gap-2 px-3 py-2 rounded-lg text-gray-200 hover:bg-gray-700 transition-colors"
+                onClick={() => setShowUserMenu(false)}
+              >
+                <ShieldCheck className="w-3.5 h-3.5 text-blue-400" />
+                <span>Switch to Manager View</span>
               </Link>
               <Link
                 href="/login"

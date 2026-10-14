@@ -68,11 +68,11 @@ export default function LoginPage() {
       const lower = email.toLowerCase();
       if (lower.includes('manager')) {
         router.push('/manager/dashboard');
-      } else if (lower.includes('user') || lower.includes('dev') || lower.includes('member')) {
-        router.push('/assignments');
-      } else {
-        // Admin login goes directly to Admin Dashboard!
+      } else if (lower.includes('admin')) {
         router.push('/admin/dashboard');
+      } else {
+        // User / Team Member login goes directly to User Dashboard!
+        router.push('/user/dashboard');
       }
     }, 300);
   };
@@ -90,10 +90,10 @@ export default function LoginPage() {
       setAuthSuccessNotice('Manager authenticated! Loading Manager Review Portal...');
       setTimeout(() => router.push('/manager/dashboard'), 350);
     } else {
-      setEmail('developer.ankit@company.com');
+      setEmail('rahul.sharma@company.com');
       setPassword('••••••••••••••');
-      setAuthSuccessNotice('Team Member authenticated! Loading Daily Workspaces...');
-      setTimeout(() => router.push('/assignments'), 350);
+      setAuthSuccessNotice('Team Member authenticated! Loading User Dashboard...');
+      setTimeout(() => router.push('/user/dashboard'), 350);
     }
   };
 
@@ -113,15 +113,31 @@ export default function LoginPage() {
           <Logo showText={true} iconSize="md" />
         </div>
 
-        {/* Right: Enterprise Portal & Direct Admin link */}
-        <div className="flex items-center gap-3 text-xs font-semibold text-gray-600">
+        {/* Right: Quick Portals & Direct Admin / Manager / User links */}
+        <div className="flex items-center gap-2 sm:gap-3 text-xs font-semibold text-gray-600">
           <Link
             href="/admin/dashboard"
             className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-lime-50 hover:bg-lime-100 text-[#4d7c0f] border border-lime-300 font-bold text-xs transition-colors"
             title="Open Admin Dashboard directly"
           >
             <Crown className="w-3.5 h-3.5 text-[#65a30d]" />
-            <span>Admin View</span>
+            <span>Admin</span>
+          </Link>
+          <Link
+            href="/manager/dashboard"
+            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 font-bold text-xs transition-colors"
+            title="Open Manager Dashboard directly"
+          >
+            <Shield className="w-3.5 h-3.5 text-blue-600" />
+            <span>Manager</span>
+          </Link>
+          <Link
+            href="/user/dashboard"
+            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 font-bold text-xs transition-colors"
+            title="Open User Dashboard directly"
+          >
+            <User className="w-3.5 h-3.5 text-emerald-600" />
+            <span>User View</span>
           </Link>
           <span className="hidden sm:inline-block text-gray-300" aria-hidden="true">
             |
@@ -267,18 +283,18 @@ export default function LoginPage() {
                   <button
                     type="button"
                     onClick={() => loginAsRole('member')}
-                    className="p-2.5 rounded-xl border border-gray-200 bg-white hover:border-gray-400 hover:bg-gray-100/70 text-left transition-all group flex flex-col justify-between shadow-2xs cursor-pointer"
+                    className="p-2.5 rounded-xl border border-gray-200 bg-white hover:border-emerald-400 hover:bg-emerald-50/70 text-left transition-all group flex flex-col justify-between shadow-2xs cursor-pointer"
                   >
                     <div className="flex items-center justify-between mb-1">
-                      <span className="text-xs font-bold text-gray-900 flex items-center gap-1.5">
-                        <User className="w-3.5 h-3.5 text-gray-500" />
-                        <span>Member</span>
+                      <span className="text-xs font-bold text-gray-900 group-hover:text-emerald-800 flex items-center gap-1.5">
+                        <User className="w-3.5 h-3.5 text-emerald-600" />
+                        <span>User / Member</span>
                       </span>
-                      <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-gray-200 text-gray-700">
-                        Tasks
+                      <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800">
+                        My Tasks
                       </span>
                     </div>
-                    <p className="text-[10px] text-gray-500 font-medium">Opens Daily Logs</p>
+                    <p className="text-[10px] text-gray-500 font-medium">Opens User Dashboard</p>
                   </button>
                 </div>
               </div>

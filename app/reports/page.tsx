@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import WorkspaceLayout from '@/components/workspace/WorkspaceLayout';
 import { INITIAL_DAILY_LOGS, type DailyLog } from '@/lib/mockData';
+import { exportToCSV } from '@/lib/exportUtils';
 
 export default function ReportsPage() {
   const [activeTab, setActiveTab] = useState<'Daily' | 'Weekly' | 'Monthly' | 'Project-wise' | 'Employee-wise' | 'Status-wise'>('Daily');
@@ -98,11 +99,31 @@ export default function ReportsPage() {
             </button>
 
             <button
-              onClick={() => showToast('Exporting consolidated audit spreadsheet to Excel format (.xlsx)...')}
-              className="inline-flex items-center gap-2 px-4 py-1.5 bg-[#65a30d] hover:bg-[#4d7c0f] text-white rounded-xl text-xs font-semibold shadow-xs hover:shadow transition-all"
+              onClick={() => {
+                const exportData = filteredLogs.map((log, idx) => ({
+                  'S.No': idx + 1,
+                  'Log ID': log.id,
+                  'Date': log.date,
+                  'Employee Name': log.employee.name,
+                  'Employee Role': log.employee.role,
+                  'Project Name': log.project.name,
+                  'Project Code': log.project.code,
+                  'Task Title': log.taskTitle,
+                  'Description': log.taskDescription,
+                  'Status': log.status,
+                  'Priority': log.priority,
+                  'Progress (%)': log.status === 'Completed' ? 100 : log.status === 'In Progress' ? 65 : 25,
+                  'Logged Hours': log.hours,
+                  'Review Status': log.status === 'Completed' ? 'Approved' : 'Pending Review',
+                  'Manager Remarks': log.status === 'Completed' ? 'Approved by Project Manager' : 'Pending Review',
+                }));
+                exportToCSV(`Ingage_TaskFlow_Report_${activeTab.toLowerCase()}_${new Date().toISOString().slice(0, 10)}`, exportData);
+                showToast(`Downloaded ${exportData.length} report records as CSV spreadsheet.`);
+              }}
+              className="inline-flex items-center gap-2 px-4 py-1.5 bg-[#65a30d] hover:bg-[#4d7c0f] text-white rounded-xl text-xs font-semibold shadow-xs hover:shadow transition-all cursor-pointer"
             >
               <FileSpreadsheet className="w-3.5 h-3.5 stroke-[2.2]" />
-              <span>Export Excel</span>
+              <span>Export CSV / Excel</span>
               <Download className="w-3 h-3" />
             </button>
           </div>
